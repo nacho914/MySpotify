@@ -1,11 +1,12 @@
 package com.vic.android.myspotify.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.vic.android.myspotify.domain.model.Artist
-import com.vic.android.myspotify.ui.artistScreen.ArtistListScreen
+import com.vic.android.myspotify.ui.artistScreen.ArtistListRoute
+import com.vic.android.myspotify.ui.artistScreen.ArtistListViewModel
 
 @Composable
 fun AppNavigation() {
@@ -16,8 +17,10 @@ fun AppNavigation() {
         startDestination = Screen.Artists.route
     ) {
         composable(Screen.Artists.route) {
-            ArtistListScreen(
-                artists = mockArtists,
+            val viewModel: ArtistListViewModel = hiltViewModel()
+
+            ArtistListRoute(
+                viewModel = viewModel,
                 onArtistClick = { artistId ->
                     navController.navigate(
                         Screen.Albums.createRoute(artistId)
@@ -33,21 +36,3 @@ fun AppNavigation() {
         }
     }
 }
-
-private val mockArtists = listOf(
-    Artist(
-        id = "1",
-        name = "Coldplay",
-        imageUrl = ""
-    ),
-    Artist(
-        id = "2",
-        name = "Arctic Monkeys",
-        imageUrl = ""
-    ),
-    Artist(
-        id = "3",
-        name = "The Weeknd",
-        imageUrl = ""
-    )
-)

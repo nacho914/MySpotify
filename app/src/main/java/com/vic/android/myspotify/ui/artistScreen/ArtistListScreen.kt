@@ -10,10 +10,25 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vic.android.myspotify.domain.model.Artist
+
+@Composable
+fun ArtistListRoute(
+    viewModel: ArtistListViewModel,
+    onArtistClick: (String) -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ArtistListScreen(
+        artists = uiState.artists,
+        onArtistClick = onArtistClick
+    )
+}
 
 @Composable
 fun ArtistListScreen(
