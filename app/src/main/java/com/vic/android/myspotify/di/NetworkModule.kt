@@ -1,6 +1,7 @@
 package com.vic.android.myspotify.di
 
 import com.vic.android.myspotify.data.remote.SpotifyApiService
+import com.vic.android.myspotify.data.remote.SpotifyAuthApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -8,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -39,5 +41,26 @@ object NetworkModule {
         retrofit: Retrofit
     ): SpotifyApiService {
         return retrofit.create(SpotifyApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @Named("spotifyAuthRetrofit")
+    fun provideSpotifyAuthRetrofit(
+        okHttpClient: OkHttpClient
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://accounts.spotify.com/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSpotifyAuthApiService(
+        @Named("spotifyAuthRetrofit") retrofit: Retrofit
+    ): SpotifyAuthApiService {
+        return retrofit.create(SpotifyAuthApiService::class.java)
     }
 }

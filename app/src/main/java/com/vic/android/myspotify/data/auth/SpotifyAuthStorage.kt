@@ -30,5 +30,25 @@ class SpotifyAuthStorage(
 
     private companion object {
         const val KEY_CODE_VERIFIER = "code_verifier"
+        const val KEY_ACCESS_TOKEN = "access_token"
+        const val KEY_REFRESH_TOKEN = "refresh_token"
     }
+
+    fun saveAccessToken(accessToken: String) {
+        preferences.edit {
+            putString(KEY_ACCESS_TOKEN, accessToken)
+        }
+    }
+
+    fun getAccessToken(): String? =
+        preferences.getString(KEY_ACCESS_TOKEN, null)
+
+    fun saveRefreshToken(refreshToken: String) {
+        preferences.edit {
+            putString(KEY_REFRESH_TOKEN, refreshToken)
+        }
+    }
+
+    fun getRefreshToken(): String? =
+        preferences.getString(KEY_REFRESH_TOKEN, null)
 }

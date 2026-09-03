@@ -5,6 +5,7 @@ import com.vic.android.myspotify.R
 import com.vic.android.myspotify.data.auth.SpotifyAuthConfig
 import com.vic.android.myspotify.data.auth.SpotifyAuthManager
 import com.vic.android.myspotify.data.auth.SpotifyAuthStorage
+import com.vic.android.myspotify.data.remote.SpotifyAuthApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,11 +32,13 @@ object SpotifyModule {
     @Singleton
     fun provideSpotifyAuthManager(
         config: SpotifyAuthConfig,
-        storage: SpotifyAuthStorage
+        storage: SpotifyAuthStorage,
+        spotifyAuthApiService: SpotifyAuthApiService
     ): SpotifyAuthManager {
         return SpotifyAuthManager(
             config = config,
-            storage = storage
+            storage = storage,
+            spotifyAuthApiService = spotifyAuthApiService
         )
     }
 

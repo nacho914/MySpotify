@@ -6,10 +6,14 @@ import android.util.Base64
 import java.security.MessageDigest
 import java.security.SecureRandom
 import androidx.core.net.toUri
+import com.vic.android.myspotify.data.remote.SpotifyAuthApiService
+import com.vic.android.myspotify.data.remote.model.SpotifyTokenResponse
 
 class SpotifyAuthManager(
     private val config: SpotifyAuthConfig,
-    private val storage: SpotifyAuthStorage
+    private val storage: SpotifyAuthStorage,
+    private val spotifyAuthApiService: SpotifyAuthApiService
+
 ) {
 
     fun generateCodeVerifier(): String {
@@ -59,5 +63,27 @@ class SpotifyAuthManager(
             Intent.ACTION_VIEW,
             buildAuthorizationUrl().toUri()
         )
+    }
+
+    suspend fun exchangeCodeForToken(code: String): SpotifyTokenResponse {
+        val codeVerifier = storage.getCodeVerifier()
+            ?: throw IllegalStateException("Code verifier not found")
+
+        val tokenResponse = spotifyAuthApiService.getAccessToken(
+            code = code,
+            redirectUri = config.redirectUri,
+            clientId = config.clientId,
+            codeVerifier = codeVerifier
+        )
+
+        storage.saveAccessToken(tokenResponse.accessToken)
+
+        tokenResponse.refreshToken?.let { refreshToken ->
+            storage.saveRefreshToken(refreshToken)
+        }
+
+        storage.clearCodeVerifier()
+
+        return tokenResponse
     }
 }
