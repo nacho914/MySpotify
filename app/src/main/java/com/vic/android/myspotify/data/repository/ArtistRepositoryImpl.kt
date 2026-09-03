@@ -1,33 +1,30 @@
 package com.vic.android.myspotify.data.repository
 
+import com.vic.android.myspotify.data.remote.SpotifyApiService
 import com.vic.android.myspotify.domain.model.Artist
 import com.vic.android.myspotify.domain.repository.ArtistRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class ArtistRepositoryImpl @Inject constructor() : ArtistRepository {
+class ArtistRepositoryImpl @Inject constructor(
+    private val spotifyApiService: SpotifyApiService
+) : ArtistRepository {
 
     override fun getArtists(): Flow<List<Artist>> {
         return flow {
+            val response = spotifyApiService.searchArtists(
+                query = "rock"
+            )
+
             emit(
-                listOf(
+                response.artists.items.map { artist ->
                     Artist(
-                        id = "1",
-                        name = "Coldplay",
-                        imageUrl = ""
-                    ),
-                    Artist(
-                        id = "2",
-                        name = "Arctic Monkeys",
-                        imageUrl = ""
-                    ),
-                    Artist(
-                        id = "3",
-                        name = "The Weeknd",
-                        imageUrl = ""
+                        id = artist.id,
+                        name = artist.name,
+                        imageUrl = artist.images.firstOrNull()?.url.orEmpty()
                     )
-                )
+                }
             )
         }
     }

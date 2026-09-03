@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">My Spotify</string>
+    <string name="spotify_client_id">cc7787fa569f432b8fba6e34c1451d4f</string>
 </resources>
