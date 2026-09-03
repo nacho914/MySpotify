@@ -1,4 +1,4 @@
-package com.vic.android.myspotify.ui.artistScreen
+package com.vic.android.myspotify.ui.artistscreen
 
 import com.vic.android.myspotify.domain.model.Artist
 

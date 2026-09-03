@@ -1,4 +1,4 @@
-package com.vic.android.myspotify.ui.artistScreen
+package com.vic.android.myspotify.ui.artistscreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -5,8 +5,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.vic.android.myspotify.ui.artistScreen.ArtistListRoute
-import com.vic.android.myspotify.ui.artistScreen.ArtistListViewModel
+import com.vic.android.myspotify.ui.artistscreen.ArtistListRoute
+import com.vic.android.myspotify.ui.artistscreen.ArtistListViewModel
 
 @Composable
 fun AppNavigation() {

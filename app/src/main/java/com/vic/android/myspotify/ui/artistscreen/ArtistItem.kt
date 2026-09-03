@@ -1,4 +1,4 @@
-package com.vic.android.myspotify.ui.artistScreen
+package com.vic.android.myspotify.ui.artistscreen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
