@@ -1,7 +1,9 @@
 package com.vic.android.myspotify.di
 
+import com.vic.android.myspotify.data.auth.SpotifyAuthStorage
 import com.vic.android.myspotify.data.remote.SpotifyApiService
 import com.vic.android.myspotify.data.remote.SpotifyAuthApiService
+import com.vic.android.myspotify.data.remote.interceptor.SpotifyAuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +20,21 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    @Named("spotifyApiClient")
+    fun provideSpotifyApiClient(
+        storage: SpotifyAuthStorage
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(
+                SpotifyAuthInterceptor(storage)
+            )
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("spotifyAuthClient")
+    fun provideSpotifyAuthClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .build()
     }
@@ -26,7 +42,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(
-        okHttpClient: OkHttpClient
+        @Named("spotifyApiClient") okHttpClient: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://api.spotify.com/")
@@ -47,7 +63,7 @@ object NetworkModule {
     @Singleton
     @Named("spotifyAuthRetrofit")
     fun provideSpotifyAuthRetrofit(
-        okHttpClient: OkHttpClient
+        @Named("spotifyAuthClient") okHttpClient: OkHttpClient
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://accounts.spotify.com/")

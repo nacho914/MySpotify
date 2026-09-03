@@ -10,7 +10,7 @@ interface SpotifyApiService {
     suspend fun searchArtists(
         @Query("q") query: String,
         @Query("type") type: String = "artist",
-        @Query("limit") limit: Int = 20,
+        @Query("limit") limit: Int = 10,
         @Query("offset") offset: Int = 0
     ): SpotifyArtistSearchResponse
 }

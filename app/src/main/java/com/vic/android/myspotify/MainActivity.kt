@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
 import com.vic.android.myspotify.data.auth.SpotifyAuthManager
+import com.vic.android.myspotify.data.auth.SpotifyAuthStorage
 import com.vic.android.myspotify.navigation.AppNavigation
 import com.vic.android.myspotify.ui.theme.MySpotifyTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,52 +20,76 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var spotifyAuthManager: SpotifyAuthManager
 
+    @Inject
+    lateinit var spotifyAuthStorage: SpotifyAuthStorage
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        handleAuthenticationIntent(intent)
 
         setContent {
             MySpotifyTheme {
                 AppNavigation()
             }
         }
-
-        if (intent?.data == null) {
-            startActivity(
-                spotifyAuthManager.getAuthorizationIntent()
-            )
-        } else {
-            handleSpotifyCallback(intent)
-        }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
-        handleSpotifyCallback(intent)
+        setIntent(intent)
+        handleAuthenticationIntent(intent)
+    }
+
+    private fun handleAuthenticationIntent(intent: Intent?) {
+        val callbackData = intent?.data
+
+        if (callbackData != null) {
+            handleSpotifyCallback(intent)
+            return
+        }
+
+        if (spotifyAuthStorage.getAccessToken().isNullOrBlank()) {
+            startActivity(
+                spotifyAuthManager.getAuthorizationIntent()
+            )
+        }
     }
 
     private fun handleSpotifyCallback(intent: Intent) {
         val data = intent.data ?: return
 
-        if (data.scheme == "myspotify" && data.host == "callback") {
-            val code = data.getQueryParameter("code") ?: return
+        if (data.scheme != "myspotify" || data.host != "callback") {
+            return
+        }
 
-            lifecycleScope.launch {
-                try {
-                    val tokenResponse =
-                        spotifyAuthManager.exchangeCodeForToken(code)
+        val code = data.getQueryParameter("code")
 
-                    Log.d(
-                        "SpotifyAuth",
-                        "Token received. Expires in: ${tokenResponse.expiresIn}"
-                    )
-                } catch (exception: Exception) {
-                    Log.e(
-                        "SpotifyAuth",
-                        "Token exchange failed",
-                        exception
-                    )
-                }
+        if (code.isNullOrBlank()) {
+            Log.e(
+                "SpotifyAuth",
+                "Authorization code not found"
+            )
+            return
+        }
+
+        lifecycleScope.launch {
+            try {
+                val tokenResponse =
+                    spotifyAuthManager.exchangeCodeForToken(code)
+
+                Log.d(
+                    "SpotifyAuth",
+                    "Token received. Expires in: ${tokenResponse.expiresIn}"
+                )
+
+            } catch (exception: Exception) {
+                Log.e(
+                    "SpotifyAuth",
+                    "Token exchange failed",
+                    exception
+                )
             }
         }
     }
