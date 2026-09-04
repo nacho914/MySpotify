@@ -1,6 +1,8 @@
 package com.vic.android.myspotify.navigation
 
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -20,7 +22,8 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Artists.route
+        startDestination = Screen.Artists.route,
+        modifier = Modifier.safeDrawingPadding()
     ) {
         composable(Screen.Artists.route) {
             val viewModel: ArtistListViewModel = hiltViewModel()
