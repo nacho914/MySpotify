@@ -4,5 +4,5 @@ import com.vic.android.myspotify.domain.model.Album
 import kotlinx.coroutines.flow.Flow
 
 interface AlbumRepository {
-    fun getAlbumsByArtist(artistId: String): Flow<List<Album>>
+    fun getAlbumsByArtist(artistId: String, offset: Int, limit: Int): Flow<List<Album>>
 }
