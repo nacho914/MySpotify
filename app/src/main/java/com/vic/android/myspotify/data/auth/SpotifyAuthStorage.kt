@@ -19,7 +19,10 @@ class SpotifyAuthStorage(
     }
 
     fun getCodeVerifier(): String? {
-        return preferences.getString(KEY_CODE_VERIFIER, null)
+        return preferences.getString(
+            KEY_CODE_VERIFIER,
+            null
+        )
     }
 
     fun clearCodeVerifier() {
@@ -28,27 +31,73 @@ class SpotifyAuthStorage(
         }
     }
 
-    private companion object {
-        const val KEY_CODE_VERIFIER = "code_verifier"
-        const val KEY_ACCESS_TOKEN = "access_token"
-        const val KEY_REFRESH_TOKEN = "refresh_token"
-    }
+    fun saveAccessToken(
+        accessToken: String,
+        expiresIn: Int
+    ) {
+        val expirationTime =
+            System.currentTimeMillis() + (expiresIn * 1000L)
 
-    fun saveAccessToken(accessToken: String) {
         preferences.edit {
-            putString(KEY_ACCESS_TOKEN, accessToken)
+            putString(
+                KEY_ACCESS_TOKEN,
+                accessToken
+            )
+                .putLong(
+                    KEY_ACCESS_TOKEN_EXPIRATION,
+                    expirationTime
+                )
         }
     }
 
-    fun getAccessToken(): String? =
-        preferences.getString(KEY_ACCESS_TOKEN, null)
+    fun getAccessToken(): String? {
+        return preferences.getString(
+            KEY_ACCESS_TOKEN,
+            null
+        )
+    }
+
+    fun isAccessTokenValid(): Boolean {
+        val accessToken = getAccessToken()
+
+        val expirationTime = preferences.getLong(
+            KEY_ACCESS_TOKEN_EXPIRATION,
+            0L
+        )
+
+        return !accessToken.isNullOrBlank() &&
+                System.currentTimeMillis() < expirationTime
+    }
 
     fun saveRefreshToken(refreshToken: String) {
         preferences.edit {
-            putString(KEY_REFRESH_TOKEN, refreshToken)
+            putString(
+                KEY_REFRESH_TOKEN,
+                refreshToken
+            )
         }
     }
 
-    fun getRefreshToken(): String? =
-        preferences.getString(KEY_REFRESH_TOKEN, null)
+    fun getRefreshToken(): String? {
+        return preferences.getString(
+            KEY_REFRESH_TOKEN,
+            null
+        )
+    }
+
+    fun clearTokens() {
+        preferences.edit {
+            remove(KEY_ACCESS_TOKEN)
+                .remove(KEY_ACCESS_TOKEN_EXPIRATION)
+                .remove(KEY_REFRESH_TOKEN)
+        }
+    }
+
+    private companion object {
+        const val KEY_CODE_VERIFIER = "code_verifier"
+        const val KEY_ACCESS_TOKEN = "access_token"
+        const val KEY_ACCESS_TOKEN_EXPIRATION =
+            "access_token_expiration"
+        const val KEY_REFRESH_TOKEN = "refresh_token"
+    }
 }

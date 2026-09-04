@@ -2,35 +2,62 @@ package com.vic.android.myspotify
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
-import com.vic.android.myspotify.data.auth.SpotifyAuthManager
-import com.vic.android.myspotify.data.auth.SpotifyAuthStorage
 import com.vic.android.myspotify.navigation.AppNavigation
+import com.vic.android.myspotify.ui.auth.SpotifyAuthViewModel
 import com.vic.android.myspotify.ui.theme.MySpotifyTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var spotifyAuthManager: SpotifyAuthManager
+    private val spotifyAuthViewModel: SpotifyAuthViewModel by viewModels()
 
-    @Inject
-    lateinit var spotifyAuthStorage: SpotifyAuthStorage
+    private var isAuthenticated by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        observeAuthenticationState()
+
         handleAuthenticationIntent(intent)
+
+        lifecycleScope.launch {
+            val authenticated =
+                spotifyAuthViewModel.initializeAuthentication()
+
+            if (!authenticated && intent?.data == null) {
+                startActivity(
+                    spotifyAuthViewModel.getAuthorizationIntent()
+                )
+            }
+        }
 
         setContent {
             MySpotifyTheme {
-                AppNavigation()
+                if (isAuthenticated) {
+                    AppNavigation()
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
         }
     }
@@ -42,55 +69,27 @@ class MainActivity : ComponentActivity() {
         handleAuthenticationIntent(intent)
     }
 
-    private fun handleAuthenticationIntent(intent: Intent?) {
-        val callbackData = intent?.data
-
-        if (callbackData != null) {
-            handleSpotifyCallback(intent)
-            return
-        }
-
-        if (spotifyAuthStorage.getAccessToken().isNullOrBlank()) {
-            startActivity(
-                spotifyAuthManager.getAuthorizationIntent()
-            )
+    private fun observeAuthenticationState() {
+        lifecycleScope.launch {
+            spotifyAuthViewModel.uiState.collectLatest { state ->
+                isAuthenticated = state.isAuthenticated
+            }
         }
     }
 
-    private fun handleSpotifyCallback(intent: Intent) {
-        val data = intent.data ?: return
+    private fun handleAuthenticationIntent(intent: Intent?) {
+        val data = intent?.data ?: return
 
-        if (data.scheme != "myspotify" || data.host != "callback") {
+        if (
+            data.scheme != "myspotify" ||
+            data.host != "callback"
+        ) {
             return
         }
 
         val code = data.getQueryParameter("code")
+            ?: return
 
-        if (code.isNullOrBlank()) {
-            Log.e(
-                "SpotifyAuth",
-                "Authorization code not found"
-            )
-            return
-        }
-
-        lifecycleScope.launch {
-            try {
-                val tokenResponse =
-                    spotifyAuthManager.exchangeCodeForToken(code)
-
-                Log.d(
-                    "SpotifyAuth",
-                    "Token received. Expires in: ${tokenResponse.expiresIn}"
-                )
-
-            } catch (exception: Exception) {
-                Log.e(
-                    "SpotifyAuth",
-                    "Token exchange failed",
-                    exception
-                )
-            }
-        }
+        spotifyAuthViewModel.handleAuthorizationCode(code)
     }
 }

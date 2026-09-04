@@ -1,6 +1,5 @@
 package com.vic.android.myspotify.data.remote.interceptor
 
-import android.util.Log
 import com.vic.android.myspotify.data.auth.SpotifyAuthStorage
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -11,11 +10,6 @@ class SpotifyAuthInterceptor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val accessToken = storage.getAccessToken()
-
-        Log.d(
-            "SpotifyAuth",
-            "Access token available: ${!accessToken.isNullOrBlank()}"
-        )
 
         val request = chain.request()
             .newBuilder()
@@ -28,12 +22,6 @@ class SpotifyAuthInterceptor(
                 }
             }
             .build()
-
-        Log.d(
-            "SpotifyAuth",
-            "Request: ${request.method} ${request.url}"
-        )
-
         return chain.proceed(request)
     }
 }
