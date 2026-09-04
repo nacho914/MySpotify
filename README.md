@@ -1,47 +1,110 @@
 # MySpotify
 
-MySpotify is an Android application that uses the Spotify Web API to browse artists, albums, and songs.
+MySpotify is an Android application built with Kotlin and Jetpack Compose that consumes the Spotify Web API to display artists, albums, and songs.
 
-The project was developed using Kotlin, Jetpack Compose, MVVM, Clean Architecture, Hilt, Coroutines, Flow, Retrofit, OkHttp, and Coil.
+The application implements Spotify OAuth 2.0 Authorization Code with PKCE, token persistence and refresh, pagination, MVVM, Clean Architecture, dependency injection, and automated tests.
 
-## Repository
+## Features
 
-GitHub repository:
+* Spotify authentication using OAuth 2.0 Authorization Code with PKCE
+* Automatic access token refresh
+* Search and display Spotify artists
+* Browse albums for a selected artist
+* Browse songs for a selected album
+* Infinite scrolling / pagination
+* Album and artist images loaded from Spotify
+* Song duration formatting
+* Loading, empty, and error states
+* Jetpack Compose UI
+* MVVM architecture
+* Clean Architecture
+* Dependency Injection with Hilt
+* Coroutines and Kotlin Flow
+* Retrofit for networking
+* OkHttp for HTTP communication
+* Coil for image loading
+* Unit tests for ViewModels
+* UI tests for Compose screens
 
-https://github.com/nacho914/MySpotify
+## Application Flow
 
----
+```text
+Spotify Authentication
+        |
+        v
+   Artist List
+        |
+        | Select artist
+        v
+    Album List
+        |
+        | Select album
+        v
+    Song List
+```
 
-# Features
+Each list supports pagination and loads additional content as the user approaches the end of the list.
 
-* Browse artists from Spotify.
-* Browse albums for a selected artist.
-* Browse songs for a selected album.
-* Spotify OAuth 2.0 authentication using Authorization Code with PKCE.
-* Automatic access token refresh.
-* Pagination using Spotify's `limit` and `offset` parameters.
-* Image loading with Coil.
-* Loading, empty, and error states.
-* Navigation between artists, albums, and songs.
-* Unit tests for ViewModels.
-* Compose UI tests for the main screens.
+## Screens
+
+### Artists
+
+The first screen displays artists retrieved from the Spotify Web API.
+
+Each artist contains:
+
+* Artist name
+* Artist image
+
+Selecting an artist navigates to the artist's albums.
+
+### Albums
+
+The album screen displays albums belonging to the selected artist.
+
+Each album contains:
+
+* Album name
+* Album image
+
+Selecting an album navigates to its songs.
+
+### Songs
+
+The song screen displays the tracks contained in the selected album.
+
+Each song contains:
+
+* Song name
+* Duration
+
+Song duration is displayed in the `minutes:seconds` format.
 
 ---
 
 # Requirements
 
-To run the application, you need:
+Before running the application, install the following:
 
-* A computer running macOS, Windows, or Linux.
-* Android Studio.
-* Android SDK.
-* A compatible JDK.
-* An Android emulator or physical Android device.
-* A Spotify account.
-* A Spotify Developer application.
-* Internet access.
+* Android Studio
+* JDK 17
+* Android SDK 37
+* A physical Android device or Android Emulator
+* A Spotify account
+* A Spotify Developer application
+* Internet connection
 
-No previous Android development experience is required. The steps below describe how to set up the environment from scratch.
+The project currently uses:
+
+* Android Gradle Plugin: `9.4.0`
+* Gradle: `9.6`
+* Kotlin: `2.2.10`
+* Java source/target compatibility: `11`
+* Compile SDK: `37`
+* Target SDK: `37`
+* Minimum SDK: `24`
+
+AGP 9.4 requires JDK 17 to run Gradle and supports API level 37. The project itself uses Java 11 source/target compatibility, which is different from the JDK used to execute Gradle.
 
 ---
 
@@ -49,54 +112,82 @@ No previous Android development experience is required. The steps below describe
 
 Download and install Android Studio from the official Android developer website.
 
-During the installation, allow Android Studio to install the recommended components, including:
+During installation, allow Android Studio to install the recommended Android SDK components.
 
-* Android SDK
-* Android SDK Platform
-* Android SDK Build-Tools
-* Android Emulator
-* Android SDK Platform-Tools
+After opening Android Studio, make sure Android SDK 37 is installed.
 
-After installation, open Android Studio and allow the initial setup to complete.
+You can check this from:
+
+```text
+Android Studio
+    > Settings
+    > Languages & Frameworks
+    > Android SDK
+```
+
+On macOS:
+
+```text
+Android Studio
+    > Settings
+    > Languages & Frameworks
+    > Android SDK
+```
+
+Make sure the following are installed:
+
+```text
+Android SDK Platform 37
+Android SDK Build-Tools
+Android SDK Platform-Tools
+Android Emulator
+```
 
 ---
 
 # 2. Configure the JDK
 
-Android Studio includes a JDK that can be used by Gradle.
+This project uses Android Gradle Plugin 9.4.0.
 
-Open Android Studio and go to:
-
-**Settings/Preferences → Build, Execution, Deployment → Build Tools → Gradle**
-
-Under **Gradle JDK**, select the JDK bundled with Android Studio if it is available.
-
-Using the JDK configured by Android Studio is recommended instead of manually configuring a separate Java installation.
-
----
-
-# 3. Install an Android SDK
+Gradle must run using JDK 17.
 
 In Android Studio, open:
 
-**Settings/Preferences → Languages & Frameworks → Android SDK**
+```text
+Settings
+    > Build, Execution, Deployment
+    > Build Tools
+    > Gradle
+```
 
-Make sure an Android SDK platform is installed.
+Set:
 
-Also verify that the following components are installed:
+```text
+Gradle JDK: JDK 17
+```
 
-* Android SDK Platform
-* Android SDK Build-Tools
-* Android SDK Platform-Tools
-* Android Emulator
+Android Studio's Gradle JDK is the JDK used to run the Gradle build. AGP 9.4 requires JDK 17.
 
-Click **Apply** if Android Studio needs to install any missing components.
+Do not confuse this with the project's Java source compatibility.
+
+The project uses:
+
+```kotlin
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+```
+
+This means the application source is compiled with Java 11 compatibility, while Gradle itself runs using JDK 17.
 
 ---
 
-# 4. Clone the Repository
+# 3. Clone the Repository
 
-Open a terminal and run:
+Clone the project from GitHub:
+
+[MySpotify GitHub Repository](https://github.com/nacho914/MySpotify?utm_source=chatgpt.com)
+
+Using Git:
 
 ```bash
 git clone https://github.com/nacho914/MySpotify.git
@@ -108,312 +199,421 @@ Then enter the project directory:
 cd MySpotify
 ```
 
-The project can also be downloaded directly from GitHub as a ZIP file.
+Open the project using Android Studio.
+
+Android Studio should automatically detect the Gradle project and start a Gradle sync.
+
+Wait for the synchronization to finish before running the application.
 
 ---
 
-# 5. Open the Project in Android Studio
-
-1. Open Android Studio.
-2. Select **Open**.
-3. Select the `MySpotify` directory.
-4. Wait for Android Studio to import the project.
-5. Wait for Gradle synchronization to finish.
-6. If Android Studio asks to install missing SDK components, allow it to do so.
-
-The first Gradle synchronization may take several minutes because Gradle needs to download the project's dependencies.
-
-The project uses Gradle Version Catalogs for dependency management.
-
----
-
-# 6. Create a Spotify Developer Application
+# 4. Create a Spotify Developer Application
 
 MySpotify uses the Spotify Web API, so a Spotify Developer application is required.
 
-Sign in to the Spotify Developer Dashboard with your Spotify account and create a new application.
+Open the Spotify Developer Dashboard:
 
-After creating the application, Spotify provides a **Client ID**.
+[Spotify for Developers](https://developer.spotify.com/?utm_source=chatgpt.com)
 
-The Client ID is required by MySpotify to start the authentication process.
+Sign in using your Spotify account.
+
+Create a new application from the Developer Dashboard.
+
+Spotify applications provide the credentials required for Web API authorization.
 
 ---
 
-# 7. Configure the Spotify Redirect URI
+# 5. Configure the Redirect URI
 
-The application uses the following redirect URI:
+The application uses a custom Android URI scheme for the OAuth callback.
+
+The redirect URI used by this project is:
 
 ```text
 myspotify://callback
 ```
 
-Add this exact Redirect URI to the Spotify Developer application.
+This value must be configured exactly in the Spotify Developer Dashboard.
 
-The value must match exactly.
+In your Spotify application settings, add:
 
 ```text
 myspotify://callback
 ```
 
-Do not change:
+The URI must match the value used by the Android application.
 
-* `myspotify`
-* `://`
-* `callback`
+The AndroidManifest registers the same scheme and host:
 
-If the Redirect URI configured in Spotify does not match the application configuration, the authentication callback will not work correctly.
-
----
-
-# 8. Configure Spotify Credentials
-
-The Spotify Client ID must be provided through the application's local configuration.
-
-Do not commit private credentials, access tokens, refresh tokens, or other secrets to Git.
-
-The repository should never contain:
-
-* Access tokens.
-* Refresh tokens.
-* Client secrets.
-* Personal Spotify credentials.
-
-If credentials are accidentally committed to a public repository, they should be revoked and replaced immediately.
-
----
-
-# 9. Configure an Android Emulator
-
-If you do not have an Android phone available, Android Studio can run the application using an emulator.
-
-Open:
-
-**Android Studio → Device Manager**
-
-Then:
-
-1. Select **Create Device**.
-2. Select an Android phone model.
-3. Select an available Android system image.
-4. Download the system image if necessary.
-5. Complete the device creation.
-6. Start the emulator.
-
-Wait until Android has completely booted before running the application.
-
----
-
-# 10. Using a Physical Android Device
-
-A physical Android device can also be used.
-
-On the Android device:
-
-1. Open **Settings**.
-2. Enable **Developer Options**.
-3. Enable **USB Debugging**.
-4. Connect the device to the computer using USB.
-5. Accept the debugging authorization prompt on the device.
-
-The device should then appear in Android Studio's device selector.
-
----
-
-# 11. Run the Application
-
-Once the project is synchronized and an Android device or emulator is running:
-
-1. Select the device from Android Studio's device selector.
-2. Select the `app` run configuration.
-3. Press **Run**.
-
-Android Studio will:
-
-1. Compile the project.
-2. Install the application.
-3. Start MySpotify on the selected device.
-
----
-
-# Authentication
-
-MySpotify uses Spotify OAuth 2.0 with Authorization Code and PKCE.
-
-The authentication flow is:
-
-```text
-┌──────────────┐
-│  MySpotify   │
-└──────┬───────┘
-       │
-       │ Authorization request
-       ▼
-┌──────────────┐
-│   Spotify    │
-└──────┬───────┘
-       │
-       │ Authorization code
-       ▼
-┌──────────────┐
-│  MySpotify   │
-│   Callback   │
-└──────┬───────┘
-       │
-       │ Code + PKCE verifier
-       ▼
-┌──────────────┐
-│   Spotify    │
-└──────┬───────┘
-       │
-       │ Access token
-       │ Refresh token
-       ▼
-┌──────────────┐
-│  MySpotify   │
-└──────────────┘
+```xml
+<data
+    android:scheme="myspotify"
+    android:host="callback" />
 ```
 
-The application uses the access token to authenticate Spotify Web API requests.
-
-When an access token expires, the application uses the refresh token to obtain a new access token without requiring the user to authenticate again.
+If the redirect URI does not match, Spotify authentication will not return correctly to the Android application.
 
 ---
 
-# Application Flow
+# 6. Configure the Spotify Client ID
 
-The application consists of three main browsing screens:
+The application requires a Spotify Client ID.
+
+The Client ID is configured in:
 
 ```text
-Artists
-   │
-   │ artistId
-   ▼
-Albums
-   │
-   │ albumId
-   ▼
-Songs
+app/src/main/res/values/strings.xml
 ```
 
-## Artists
+Find:
 
-The first screen searches Spotify for artists.
+```xml
+<string name="spotify_client_id">YOUR_SPOTIFY_CLIENT_ID</string>
+```
 
-Endpoint:
+Replace `YOUR_SPOTIFY_CLIENT_ID` with the Client ID from your Spotify Developer application.
+
+For example:
+
+```xml
+<string name="spotify_client_id">your_client_id_here</string>
+```
+
+The Client ID is an application identifier. It is not equivalent to a Client Secret or an access/refresh token.
+
+Do not place a Spotify Client Secret, access token, or refresh token in the source code.
+
+---
+
+# 7. Spotify Development Mode
+
+Spotify applications may run in Development Mode.
+
+Development Mode has restrictions on who can use the application and on API usage. Spotify's current Development Mode requirements include a Spotify Premium requirement for the developer and restrictions on authorized users.
+
+If authentication fails even though the Client ID and redirect URI are correct, check the Spotify Developer Dashboard and make sure the Spotify account being used for testing is authorized for the application.
+
+For a different developer evaluating the project, there are two options:
+
+1. Use their own Spotify Developer application and replace the Client ID in `strings.xml`.
+2. Use an account that is authorized by the application owner, when permitted by Spotify's Development Mode configuration.
+
+Spotify's Web API documentation should be consulted for the latest Development Mode requirements because these restrictions can change.
+
+---
+
+# 8. Run the Application
+
+After configuring the Spotify Client ID:
+
+1. Open the project in Android Studio.
+2. Wait for Gradle synchronization to complete.
+3. Connect an Android device or create an Android Emulator.
+4. Select the `app` run configuration.
+5. Press **Run**.
+
+The application should start with the Spotify authentication flow.
+
+If authentication is successful, the application will display the artist list.
+
+---
+
+# Authentication Flow
+
+The application uses OAuth 2.0 Authorization Code with PKCE.
+
+The high-level flow is:
+
+```text
+Android Application
+        |
+        | Authorization request
+        v
+Spotify Authorization
+        |
+        | Redirect
+        v
+myspotify://callback
+        |
+        v
+Android Application
+        |
+        | Authorization code
+        v
+Spotify Token Endpoint
+        |
+        | Access token + Refresh token
+        v
+Spotify Web API
+```
+
+The application does not use the deprecated Implicit Grant flow.
+
+The access token is used to authenticate Spotify Web API requests.
+
+When the access token expires, the application uses the refresh token to obtain a new access token.
+
+---
+
+# API Endpoints
+
+The application currently uses the following Spotify Web API endpoints.
+
+## Search Artists
 
 ```text
 GET /v1/search
 ```
 
-The request specifies:
+The application searches for artists and uses the returned artist data to populate the first screen.
+
+The request includes:
 
 ```text
 type=artist
+limit=10
+offset=<current offset>
 ```
 
-Selecting an artist navigates to the artist's albums.
-
-## Albums
-
-The album screen retrieves albums for the selected artist.
-
-Endpoint:
+## Get Artist Albums
 
 ```text
 GET /v1/artists/{artistId}/albums
 ```
 
-Selecting an album navigates to the album's songs.
+The selected artist ID is used to retrieve the artist's albums.
 
-## Songs
+The request includes:
 
-The song screen retrieves tracks belonging to the selected album.
+```text
+limit=10
+offset=<current offset>
+```
 
-Endpoint:
+## Get Album Tracks
 
 ```text
 GET /v1/albums/{albumId}/tracks
+```
+
+The selected album ID is used to retrieve its tracks.
+
+The request includes:
+
+```text
+limit=10
+offset=<current offset>
 ```
 
 ---
 
 # Pagination
 
-Artists, albums, and songs use Spotify's pagination parameters:
+The application implements offset-based pagination.
 
-* `limit`
-* `offset`
+The page size is currently:
 
-The application loads a page of results and requests additional data as the user approaches the end of the current list.
+```text
+10 items
+```
 
-The Compose `LazyColumn` observes the scroll position and triggers another request when the user gets close to the end of the currently loaded results.
+The initial request starts at:
+
+```text
+offset = 0
+```
+
+The next request uses the offset after the previous page.
+
+For example:
+
+```text
+Request 1:
+offset = 0
+limit = 10
+
+Request 2:
+offset = 10
+limit = 10
+
+Request 3:
+offset = 20
+limit = 10
+```
+
+The UI monitors the user's scroll position.
+
+When the user approaches the end of the current list, another page is requested.
+
+The same approach is used for:
+
+* Artists
+* Albums
+* Songs
+
+Pagination prevents the application from loading the entire result set at once.
+
+Spotify also applies API rate limits and Development Mode quota restrictions, so clients should avoid unnecessary API requests.
 
 ---
 
 # Architecture
 
-The project follows **Clean Architecture with MVVM**.
+The application follows Clean Architecture with MVVM.
+
+The main layers are:
 
 ```text
-┌─────────────────────────────┐
-│       Jetpack Compose       │
-│             UI              │
-└──────────────┬──────────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│          ViewModel          │
-└──────────────┬──────────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│          Use Case           │
-└──────────────┬──────────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│         Repository          │
-└──────────────┬──────────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│       Spotify API           │
-│    Retrofit / OkHttp        │
-└─────────────────────────────┘
+Presentation
+     |
+     v
+Domain
+     |
+     v
+Data
+     |
+     v
+Remote API
 ```
 
 ## Presentation Layer
 
-The presentation layer contains:
+Responsible for:
 
-* Jetpack Compose screens.
-* UI state models.
-* ViewModels.
-* Navigation.
+* Compose UI
+* UI state
+* ViewModels
+* Navigation
+* User interactions
 
-ViewModels expose UI state through `StateFlow`.
+Examples:
 
-Asynchronous operations are handled using Kotlin Coroutines and Flow.
+```text
+ui/artistscreen
+ui/albumscreen
+ui/songscreen
+ui/auth
+```
 
 ## Domain Layer
 
-The domain layer contains:
+Contains application business models and use cases.
 
-* Domain models.
-* Repository interfaces.
-* Use cases.
+Examples:
 
-The domain layer does not depend directly on Retrofit, OkHttp, or Spotify-specific networking implementations.
+```text
+domain/model/Artist.kt
+domain/model/Album.kt
+domain/model/Song.kt
+```
+
+Use cases include:
+
+```text
+GetArtistsUseCase
+GetAlbumsByArtistUseCase
+GetSongsByAlbumUseCase
+```
+
+The domain layer does not depend directly on Retrofit or Android UI components.
 
 ## Data Layer
 
-The data layer contains:
+Responsible for retrieving and mapping remote data.
 
-* Repository implementations.
-* Retrofit API services.
-* Spotify API response models.
-* Authentication components.
-* Token management.
+The repositories expose domain models to the domain layer.
+
+Examples:
+
+```text
+ArtistRepository
+ArtistRepositoryImpl
+
+AlbumRepository
+AlbumRepositoryImpl
+
+SongRepository
+SongRepositoryImpl
+```
+
+The repositories communicate with:
+
+```text
+SpotifyApiService
+```
+
+---
+
+# MVVM
+
+The application uses Model-View-ViewModel.
+
+The general flow is:
+
+```text
+Compose UI
+    |
+    | User action
+    v
+ViewModel
+    |
+    v
+Use Case
+    |
+    v
+Repository
+    |
+    v
+Spotify API
+    |
+    v
+Repository
+    |
+    v
+ViewModel
+    |
+    | StateFlow
+    v
+Compose UI
+```
+
+The ViewModel exposes immutable `StateFlow` objects to the UI.
+
+For example:
+
+```kotlin
+val uiState: StateFlow<ArtistListUiState>
+```
+
+The UI observes the state using lifecycle-aware collection.
+
+---
+
+# UI State
+
+Each screen has a dedicated UI state.
+
+For example:
+
+```kotlin
+data class ArtistListUiState(
+    val artists: List<Artist> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val hasMore: Boolean = true
+)
+```
+
+The UI can therefore represent:
+
+```text
+Loading
+Success
+Empty
+Error
+```
+
+without directly managing network operations.
 
 ---
 
@@ -421,267 +621,527 @@ The data layer contains:
 
 Hilt is used for dependency injection.
 
-It provides dependencies such as:
+The main dependencies include:
 
-* Retrofit services.
-* Repositories.
-* Use cases.
-* Authentication components.
-* ViewModels.
+```text
+SpotifyApiService
+ArtistRepository
+AlbumRepository
+SongRepository
+GetArtistsUseCase
+GetAlbumsByArtistUseCase
+GetSongsByAlbumUseCase
+```
 
-This reduces coupling between components and makes the application easier to test.
+The dependency graph is configured through Hilt modules.
+
+This keeps object creation outside of the ViewModels and makes dependencies easier to replace during testing.
+
+---
+
+# Networking
+
+The application uses:
+
+* Retrofit
+* OkHttp
+* Gson
+* Kotlin Coroutines
+
+Retrofit defines the Spotify API interface:
+
+```kotlin
+interface SpotifyApiService
+```
+
+OkHttp handles HTTP communication.
+
+An authentication interceptor adds the current access token to Spotify API requests.
+
+The authentication layer is responsible for:
+
+* Authorization
+* Access token storage
+* Refresh token handling
+* Token refresh
+* Authentication state
+
+---
+
+# Image Loading
+
+Spotify artist and album images are loaded using Coil.
+
+The application uses:
+
+```text
+coil-compose
+coil-network-okhttp
+```
+
+Images are displayed directly from the URLs returned by Spotify.
+
+---
+
+# Navigation
+
+Navigation is implemented using Jetpack Navigation Compose.
+
+The application contains three main destinations:
+
+```text
+artists
+albums/{artistId}
+songs/{albumId}
+```
+
+The selected artist ID is passed to the album screen.
+
+The selected album ID is passed to the song screen.
+
+Example:
+
+```text
+artists
+   |
+   | artistId
+   v
+albums/{artistId}
+   |
+   | albumId
+   v
+songs/{albumId}
+```
 
 ---
 
 # Project Structure
 
+The project follows a package structure based on application responsibility.
+
 ```text
-com.vic.android.myspotify
-│
-├── data
-│   ├── model
-│   ├── network
-│   └── repository
-│
-├── domain
-│   ├── model
-│   ├── repository
-│   └── usecase
-│
-├── di
-│
-├── navigation
-│
-└── ui
-    ├── artistscreen
-    ├── albumscreen
-    └── songscreen
+app/
+└── src/
+    ├── main/
+    │   ├── java/
+    │   │   └── com/
+    │   │       └── vic/
+    │   │           └── android/
+    │   │               └── myspotify/
+    │   │                   │
+    │   │                   ├── data/
+    │   │                   │   ├── model/
+    │   │                   │   ├── remote/
+    │   │                   │   └── repository/
+    │   │                   │
+    │   │                   ├── di/
+    │   │                   │
+    │   │                   ├── domain/
+    │   │                   │   ├── model/
+    │   │                   │   ├── repository/
+    │   │                   │   └── usecase/
+    │   │                   │
+    │   │                   ├── navigation/
+    │   │                   │
+    │   │                   └── ui/
+    │   │                       ├── auth/
+    │   │                       ├── artistscreen/
+    │   │                       ├── albumscreen/
+    │   │                       └── songscreen/
+    │   │
+    │   └── res/
+    │       └── values/
+    │           └── strings.xml
+    │
+    ├── test/
+    │   └── ...
+    │
+    └── androidTest/
+        └── ...
 ```
-
----
-
-# Technology Stack
-
-* Kotlin
-* Jetpack Compose
-* Material 3
-* MVVM
-* Clean Architecture
-* Kotlin Coroutines
-* Flow
-* StateFlow
-* Hilt
-* Retrofit
-* OkHttp
-* Gson
-* Coil
-* Navigation Compose
-* JUnit
-* MockK
-* Compose UI Testing
 
 ---
 
 # Testing
 
-The project contains both unit tests and Compose UI tests.
+The project includes both unit tests and UI tests.
 
 ## Unit Tests
 
-The ViewModels are tested independently from Android UI components and the Spotify API.
+ViewModels are tested using:
+
+* JUnit
+* Kotlin Coroutines Test
+* MockK
 
 The tests cover:
 
-* Successful data loading.
-* Loading additional pages.
-* Appending subsequent pages.
-* Preventing multiple simultaneous loading requests.
-* Error handling.
+* Successful requests
+* Pagination
+* Loading protection
+* Error handling
 
-`MockK` is used to mock dependencies.
+The tested ViewModels include:
 
-`kotlinx-coroutines-test` is used to control coroutine execution during tests.
+```text
+ArtistListViewModel
+AlbumListViewModel
+SongListViewModel
+```
 
-Run the unit tests with:
+## UI Tests
+
+Jetpack Compose UI tests verify:
+
+### Artist screen
+
+* Artists are displayed
+* Clicking an artist invokes the expected callback
+
+### Album screen
+
+* Albums are displayed
+* Clicking an album invokes the expected callback
+
+### Song screen
+
+* Songs are displayed
+* Song duration is formatted correctly
+
+The UI tests use:
+
+```text
+Compose Test Rule
+onNodeWithText
+performClick
+assertIsDisplayed
+```
+
+---
+
+# Running Tests
+
+To run unit tests from Android Studio:
+
+```text
+Right click app
+    > Run 'Tests in app'
+```
+
+Or use Gradle from the terminal:
 
 ```bash
 ./gradlew test
 ```
 
----
-
-# UI Tests
-
-The main Compose screens contain UI tests.
-
-## Artists
-
-The tests verify:
-
-* Artists are displayed.
-* Clicking an artist invokes the expected callback.
-
-## Albums
-
-The tests verify:
-
-* Albums are displayed.
-* Clicking an album invokes the expected callback.
-
-## Songs
-
-The tests verify:
-
-* Songs are displayed.
-* Song durations are displayed using the expected format.
-
-To run the Compose UI tests, start an Android emulator or connect a physical Android device and run:
+To run instrumentation/UI tests on a connected device or emulator:
 
 ```bash
-./gradlew connectedDebugAndroidTest
+./gradlew connectedAndroidTest
 ```
-
-The UI tests can also be executed directly from Android Studio.
-
----
-
-# Running the Complete Test Suite
-
-Run unit tests:
-
-```bash
-./gradlew test
-```
-
-Run Compose UI tests:
-
-```bash
-./gradlew connectedDebugAndroidTest
-```
-
-Before submitting the project, run both test suites and verify that the application builds and tests successfully.
 
 ---
 
 # Troubleshooting
 
-## Gradle Synchronization Fails
+## Gradle says that Java 17 is required
 
-If Gradle synchronization fails:
+Make sure Android Studio is using JDK 17 for Gradle.
 
-1. Verify that Android Studio is correctly installed.
-2. Verify the Gradle JDK configuration.
-3. Verify that the required Android SDK components are installed.
-4. Verify your internet connection.
-5. Wait for Gradle to finish downloading all dependencies.
+Go to:
 
-You can also try:
-
-```bash
-./gradlew clean
+```text
+Settings
+    > Build, Execution, Deployment
+    > Build Tools
+    > Gradle
 ```
 
-Then synchronize the project again from Android Studio.
+Set:
 
-## Spotify Authentication Fails
+```text
+Gradle JDK = JDK 17
+```
 
-Verify that:
+AGP 9.4 requires JDK 17.
 
-1. A Spotify Developer application has been created.
-2. The Client ID is correctly configured.
-3. The Redirect URI is exactly:
+---
+
+## Spotify authentication does not return to the application
+
+Verify that the redirect URI configured in the Spotify Developer Dashboard is exactly:
 
 ```text
 myspotify://callback
 ```
 
-4. The Spotify account being used can access the application.
-5. The credentials are valid.
-6. The application has an internet connection.
-
-## The Application Cannot Connect to Spotify
-
-Check:
-
-* Internet connectivity.
-* Spotify API availability.
-* Authentication status.
-* Android Studio Logcat for additional error information.
+Also make sure the Android application is using the same URI.
 
 ---
 
-# Security
+## Spotify returns an authorization error
 
-Never commit sensitive authentication information to the repository.
+Check:
 
-Do not commit:
+1. The Client ID is correct.
+2. The Spotify Developer application is active.
+3. The redirect URI is configured correctly.
+4. The Spotify account being used for testing is authorized for the application if Development Mode requires it.
+5. The Spotify account satisfies the current Spotify Development Mode requirements.
 
-* Spotify access tokens.
-* Spotify refresh tokens.
-* Client secrets.
-* Passwords.
-* Other private credentials.
+Spotify's Development Mode rules have changed during 2026, so consult the current Spotify Developer documentation if the behavior differs from this README.
 
-If a credential is accidentally committed to Git, revoke it and replace it before making the repository public.
+---
+
+## Artists, albums, or songs are not loading
+
+Check:
+
+* Internet connection
+* Spotify authentication state
+* Logcat for HTTP errors
+* Spotify Developer Dashboard configuration
+* Access token expiration/refresh behavior
+
+A `401` response generally indicates an authentication problem.
+
+A `429` response indicates that a Spotify API rate or quota limit has been reached.
+
+---
+
+# Security Considerations
+
+The project intentionally does not use a Spotify Client Secret inside the Android application.
+
+A mobile application cannot safely keep a confidential client secret because the application package can be inspected.
+
+The application therefore uses Authorization Code with PKCE.
+
+Sensitive credentials such as:
+
+```text
+Client Secret
+Access Token
+Refresh Token
+```
+
+must not be committed to Git.
+
+The Spotify Client ID is configured as an application resource because it identifies the Spotify application but is not a secret credential.
 
 ---
 
 # Design Decisions
 
-## Clean Architecture
+## Why Jetpack Compose?
 
-Clean Architecture was used to separate presentation, business logic, and data access responsibilities.
+Jetpack Compose provides a declarative approach to Android UI development.
 
-This allows the domain layer to remain independent from Android UI and networking implementation details.
+It also makes UI state easier to connect to `StateFlow` exposed by ViewModels.
 
-## MVVM
+## Why MVVM?
 
-ViewModels handle UI-related state and business flow while keeping composables focused on rendering the UI.
+MVVM keeps UI rendering separate from business and data operations.
 
-## StateFlow
+The ViewModel owns screen state and coordinates use cases.
 
-`StateFlow` provides a single observable source of UI state for each screen.
+## Why Clean Architecture?
 
-This makes state changes explicit and allows Compose to react to state updates.
+Clean Architecture keeps the domain layer independent from Android UI and networking implementations.
 
-## Repository Pattern
+This makes the application easier to:
 
-Repositories abstract data access from the domain layer.
+* Test
+* Maintain
+* Extend
+* Refactor
 
-Use cases interact with repository interfaces rather than directly depending on Retrofit or Spotify API implementations.
+## Why Kotlin Flow?
 
-## Dependency Injection
+The application uses Flow to represent asynchronous data streams and expose state from repositories and ViewModels.
 
-Hilt provides dependencies throughout the application and reduces direct coupling between components.
+This integrates naturally with Kotlin Coroutines and lifecycle-aware Compose state collection.
 
-It also makes ViewModels easier to test because their dependencies can be replaced with mocks.
+## Why Hilt?
 
-## Coroutines and Flow
+Hilt provides compile-time dependency injection and integrates directly with Android components such as ViewModels.
 
-Kotlin Coroutines are used for asynchronous operations.
+## Why Retrofit?
 
-Flow is used to represent asynchronous data streams between the data, domain, and presentation layers.
+Retrofit provides a clear interface-based abstraction for the Spotify REST API and works naturally with Kotlin suspend functions.
 
-## Jetpack Compose
+## Why pagination?
 
-Jetpack Compose provides a declarative UI approach and allows the main screens to be tested independently from networking and navigation.
+Pagination avoids loading large result sets into memory at once and demonstrates the use of Spotify's `offset` and `limit` parameters.
+
+---
+
+# Technical Stack
+
+| Technology         | Purpose                      |
+| ------------------ | ---------------------------- |
+| Kotlin             | Primary programming language |
+| Jetpack Compose    | UI                           |
+| Material 3         | UI components                |
+| MVVM               | Presentation architecture    |
+| Clean Architecture | Application architecture     |
+| Hilt               | Dependency Injection         |
+| Coroutines         | Asynchronous programming     |
+| Flow               | Reactive data streams        |
+| Retrofit           | REST API client              |
+| OkHttp             | HTTP client                  |
+| Gson               | JSON serialization           |
+| Coil               | Image loading                |
+| Navigation Compose | Navigation                   |
+| JUnit              | Unit testing                 |
+| MockK              | Mocking                      |
+| Compose UI Test    | UI testing                   |
+
+---
+
+# Requirements Summary
+
+| Requirement           | Version                |
+| --------------------- | ---------------------- |
+| Minimum Android SDK   | 24                     |
+| Compile SDK           | 37                     |
+| Target SDK            | 37                     |
+| Android Gradle Plugin | 9.4.0                  |
+| Gradle                | 9.6                    |
+| Gradle JDK            | 17                     |
+| Java source/target    | 11                     |
+| Kotlin                | 2.2.10                 |
+| Jetpack Compose       | Compose BOM 2026.02.01 |
+| Hilt                  | 2.59.2                 |
+| Retrofit              | 2.11.0                 |
+| OkHttp                | 4.12.0                 |
+| Coil                  | 3.4.0                  |
+
+---
+
+# Complete Setup Checklist
+
+If you are setting up the project for the first time, follow this checklist:
+
+```text
+[ ] Install Android Studio
+[ ] Install Android SDK 37
+[ ] Configure Gradle to use JDK 17
+[ ] Clone the MySpotify repository
+[ ] Open the project in Android Studio
+[ ] Wait for Gradle synchronization
+[ ] Create or configure a Spotify Developer application
+[ ] Configure myspotify://callback as the redirect URI
+[ ] Copy the Spotify Client ID
+[ ] Open app/src/main/res/values/strings.xml
+[ ] Replace YOUR_SPOTIFY_CLIENT_ID
+[ ] Verify Spotify Development Mode access
+[ ] Start an Android Emulator or connect a physical device
+[ ] Run the application
+[ ] Authenticate with Spotify
+[ ] Browse artists
+[ ] Select an artist
+[ ] Browse albums
+[ ] Select an album
+[ ] Browse songs
+```
+
+---
+
+# Application Flow Summary
+
+Once configured, the complete application flow is:
+
+```text
+                 +-------------------+
+                 | Spotify OAuth PKCE|
+                 +---------+---------+
+                           |
+                           v
+                 +-------------------+
+                 |   Artist Screen   |
+                 |                   |
+                 | Artist 1          |
+                 | Artist 2          |
+                 | Artist 3          |
+                 | ...               |
+                 +---------+---------+
+                           |
+                     Select artist
+                           |
+                           v
+                 +-------------------+
+                 |    Album Screen   |
+                 |                   |
+                 | Album 1           |
+                 | Album 2           |
+                 | Album 3           |
+                 | ...               |
+                 +---------+---------+
+                           |
+                     Select album
+                           |
+                           v
+                 +-------------------+
+                 |    Song Screen    |
+                 |                   |
+                 | Song 1     3:42   |
+                 | Song 2     4:15   |
+                 | Song 3     2:58   |
+                 | ...               |
+                 +-------------------+
+```
+
+---
+
+# Repository
+
+Source code:
+
+[MySpotify on GitHub](https://github.com/nacho914/MySpotify?utm_source=chatgpt.com)
+
+---
+
+# Spotify Documentation
+
+For additional information about the Spotify Web API, OAuth, applications, and Development Mode:
+
+[Spotify Web API Documentation](https://developer.spotify.com/documentation/web-api?utm_source=chatgpt.com)
+
+[Spotify Web API Getting Started](https://developer.spotify.com/documentation/web-api/tutorials/getting-started?utm_source=chatgpt.com)
+
+[Spotify Apps Documentation](https://developer.spotify.com/documentation/web-api/concepts/apps?utm_source=chatgpt.com)
 
 ---
 
 # Conclusion
 
-MySpotify demonstrates an Android application built around modern Android development practices, including:
+MySpotify demonstrates a complete Android application architecture for consuming the Spotify Web API.
 
-* Kotlin.
-* Jetpack Compose.
-* MVVM.
-* Clean Architecture.
-* Dependency Injection.
-* Coroutines and Flow.
-* REST API integration.
-* Spotify OAuth 2.0 with PKCE.
-* Pagination.
-* Unit testing.
-* Compose UI testing.
-* Separation of concerns.
-* Maintainable and testable code.
+The project combines:
+
+```text
+Kotlin
++
+Jetpack Compose
++
+MVVM
++
+Clean Architecture
++
+Hilt
++
+Coroutines / Flow
++
+Retrofit / OkHttp
++
+Spotify OAuth PKCE
++
+Pagination
++
+Unit Tests
++
+UI Tests
+```
+
+The application is designed to keep presentation, business logic, and data access separated while providing a straightforward user experience for browsing Spotify artists, albums, and songs.
