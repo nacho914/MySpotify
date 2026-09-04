@@ -11,6 +11,8 @@ import com.vic.android.myspotify.ui.albumscreen.AlbumListRoute
 import com.vic.android.myspotify.ui.albumscreen.AlbumListViewModel
 import com.vic.android.myspotify.ui.artistscreen.ArtistListRoute
 import com.vic.android.myspotify.ui.artistscreen.ArtistListViewModel
+import com.vic.android.myspotify.ui.songscreen.SongListRoute
+import com.vic.android.myspotify.ui.songscreen.SongListViewModel
 
 @Composable
 fun AppNavigation() {
@@ -59,7 +61,25 @@ fun AppNavigation() {
             )
         }
 
-        composable(Screen.Songs.route) {
+        composable(
+            route = Screen.Songs.route,
+            arguments = listOf(
+                navArgument("albumId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+
+            val albumId =
+                backStackEntry.arguments?.getString("albumId")
+                    ?: return@composable
+
+            val viewModel: SongListViewModel = hiltViewModel()
+
+            SongListRoute(
+                albumId = albumId,
+                viewModel = viewModel
+            )
         }
     }
 }

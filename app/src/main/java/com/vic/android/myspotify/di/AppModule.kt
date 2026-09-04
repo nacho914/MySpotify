@@ -2,8 +2,10 @@ package com.vic.android.myspotify.di
 
 import com.vic.android.myspotify.data.repository.AlbumRepositoryImpl
 import com.vic.android.myspotify.data.repository.ArtistRepositoryImpl
+import com.vic.android.myspotify.data.repository.SongRepositoryImpl
 import com.vic.android.myspotify.domain.repository.AlbumRepository
 import com.vic.android.myspotify.domain.repository.ArtistRepository
+import com.vic.android.myspotify.domain.repository.SongRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -22,4 +24,9 @@ abstract class AppModule {
     abstract fun bindAlbumRepository(
         repositoryImpl: AlbumRepositoryImpl
     ): AlbumRepository
+
+    @Binds
+    abstract fun bindSongRepository(
+        repositoryImpl: SongRepositoryImpl
+    ): SongRepository
 }
