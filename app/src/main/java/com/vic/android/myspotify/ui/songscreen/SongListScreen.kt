@@ -6,25 +6,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vic.android.myspotify.domain.model.Song
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun SongListScreen(
     songs: List<Song>,
     isLoading: Boolean,
-    error: String?
+    error: String?,
+    onLoadMore: () -> Unit
 ) {
+    val listState = rememberLazyListState()
+
     when {
-        isLoading -> {
+        isLoading && songs.isEmpty() -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -33,7 +39,7 @@ fun SongListScreen(
             }
         }
 
-        error != null -> {
+        error != null && songs.isEmpty() -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -55,8 +61,26 @@ fun SongListScreen(
         }
 
         else -> {
+            LaunchedEffect(listState) {
+                snapshotFlow {
+                    listState.layoutInfo.visibleItemsInfo
+                        .lastOrNull()
+                        ?.index
+                }
+                    .distinctUntilChanged()
+                    .collect { lastVisibleIndex ->
+                        if (
+                            lastVisibleIndex != null &&
+                            lastVisibleIndex >= songs.lastIndex - 2
+                        ) {
+                            onLoadMore()
+                        }
+                    }
+            }
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
+                state = listState,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 items(
@@ -84,6 +108,9 @@ fun SongListRoute(
     SongListScreen(
         songs = uiState.songs,
         isLoading = uiState.isLoading,
-        error = uiState.error
+        error = uiState.error,
+        onLoadMore = {
+            viewModel.loadSongs(albumId)
+        }
     )
 }

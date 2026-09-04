@@ -25,22 +25,54 @@ class SongListViewModel @Inject constructor(
     val uiState: StateFlow<SongListUiState> =
         _uiState.asStateFlow()
 
+    private var currentAlbumId: String? = null
+    private var currentOffset = 0
+    private val pageSize = 10
+    private var isLoadingPage = false
+
     fun loadSongs(albumId: String) {
-        getSongsByAlbumUseCase(albumId)
+
+        if (currentAlbumId != albumId) {
+            currentAlbumId = albumId
+            currentOffset = 0
+            isLoadingPage = false
+
+            _uiState.value = SongListUiState()
+        }
+
+        if (isLoadingPage) return
+
+        isLoadingPage = true
+
+        getSongsByAlbumUseCase(
+            albumId = albumId,
+            offset = currentOffset,
+            limit = pageSize
+        )
             .onStart {
-                _uiState.value = SongListUiState(
-                    isLoading = true
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    error = null
                 )
             }
             .onEach { songs ->
-                _uiState.value = SongListUiState(
-                    songs = songs
+                currentOffset += songs.size
+
+                _uiState.value = _uiState.value.copy(
+                    songs = _uiState.value.songs + songs,
+                    isLoading = false,
+                    error = null
                 )
+
+                isLoadingPage = false
             }
             .catch { exception ->
-                _uiState.value = SongListUiState(
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
                     error = exception.message
                 )
+
+                isLoadingPage = false
             }
             .launchIn(viewModelScope)
     }

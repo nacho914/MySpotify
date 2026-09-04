@@ -4,12 +4,10 @@ import com.vic.android.myspotify.domain.model.Song
 import com.vic.android.myspotify.domain.repository.SongRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-
-
 class GetSongsByAlbumUseCase @Inject constructor(
     private val repository: SongRepository
 ) {
-    operator fun invoke(albumId: String): Flow<List<Song>> {
-        return repository.getSongsByAlbum(albumId)
+    operator fun invoke(albumId: String, offset: Int, limit: Int): Flow<List<Song>> {
+        return repository.getSongsByAlbum(albumId = albumId, offset = offset, limit = limit)
     }
 }

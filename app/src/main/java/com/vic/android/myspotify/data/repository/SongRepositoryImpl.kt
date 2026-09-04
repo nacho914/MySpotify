@@ -12,11 +12,15 @@ class SongRepositoryImpl @Inject constructor(
 ) : SongRepository {
 
     override fun getSongsByAlbum(
-        albumId: String
+        albumId: String,
+        offset: Int,
+        limit: Int
     ): Flow<List<Song>> {
         return flow {
             val response = spotifyApiService.getAlbumTracks(
-                albumId = albumId
+                albumId = albumId,
+                offset = offset,
+                limit = limit
             )
 
             emit(
