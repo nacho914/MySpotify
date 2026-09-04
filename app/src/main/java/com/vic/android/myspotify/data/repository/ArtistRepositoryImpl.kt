@@ -11,10 +11,15 @@ class ArtistRepositoryImpl @Inject constructor(
     private val spotifyApiService: SpotifyApiService
 ) : ArtistRepository {
 
-    override fun getArtists(): Flow<List<Artist>> {
+    override fun getArtists(
+        offset: Int,
+        limit: Int
+    ): Flow<List<Artist>> {
         return flow {
             val response = spotifyApiService.searchArtists(
-                query = "rock"
+                query = "rock",
+                limit = limit,
+                offset = offset
             )
 
             emit(
@@ -22,7 +27,10 @@ class ArtistRepositoryImpl @Inject constructor(
                     Artist(
                         id = artist.id,
                         name = artist.name,
-                        imageUrl = artist.images.firstOrNull()?.url.orEmpty()
+                        imageUrl = artist.images
+                            .firstOrNull()
+                            ?.url
+                            .orEmpty()
                     )
                 }
             )

@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 class GetArtistsUseCase @Inject constructor(
     private val repository: ArtistRepository
 ) {
-    operator fun invoke(): Flow<List<Artist>> {
-        return repository.getArtists()
-    }
+    operator fun invoke(offset: Int, limit: Int): Flow<List<Artist>> =
+        repository.getArtists(offset = offset, limit = limit)
 }

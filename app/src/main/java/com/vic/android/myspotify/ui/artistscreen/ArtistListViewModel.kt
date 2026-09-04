@@ -12,42 +12,55 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class ArtistListViewModel @Inject constructor(
     private val getArtistsUseCase: GetArtistsUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ArtistListUiState())
-    val uiState: StateFlow<ArtistListUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(
+        ArtistListUiState()
+    )
 
-    init {
-        getArtists()
-    }
+    val uiState: StateFlow<ArtistListUiState> =
+        _uiState.asStateFlow()
 
-    private fun getArtists() {
-        getArtistsUseCase()
+    private var currentOffset = 0
+    private val pageSize = 10
+    private var isLoadingPage = false
+
+    fun loadArtists() {
+        if (isLoadingPage) return
+
+        isLoadingPage = true
+
+        getArtistsUseCase(
+            offset = currentOffset,
+            limit = pageSize
+        )
             .onStart {
-                _uiState.update {
-                    it.copy(isLoading = true)
-                }
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    error = null
+                )
             }
             .onEach { artists ->
-                _uiState.update {
-                    it.copy(
-                        artists = artists,
-                        isLoading = false
-                    )
-                }
+                _uiState.value = _uiState.value.copy(
+                    artists = _uiState.value.artists + artists,
+                    isLoading = false,
+                    error = null
+                )
+
+                currentOffset += artists.size
+                isLoadingPage = false
             }
-            .catch { error ->
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = error.message
-                    )
-                }
+            .catch { exception ->
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = exception.message
+                )
+
+                isLoadingPage = false
             }
             .launchIn(viewModelScope)
     }
